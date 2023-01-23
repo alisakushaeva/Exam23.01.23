@@ -4,6 +4,7 @@ import ru.kushaevaa.Converter;
 import ru.kushaevaa.graphics.*;
 import ru.kushaevaa.graphics.Painter;
 import ru.kushaevaa.math.Function;
+import ru.kushaevaa.math.FunctionExplicit;
 
 
 import javax.swing.*;
@@ -50,8 +51,8 @@ public class MainWindow extends JFrame {
         ch2 = new JCheckBox("", true);
         ch3 = new JCheckBox("", true);
 
-        clr1n = new JLabel("Цвет точек");
-        clr2n = new JLabel("Цвет полинома");
+        clr1n = new JLabel("Явное задание");
+        clr2n = new JLabel("Неявное задание");
         clr3n = new JLabel("Цвет производной");
 
 
@@ -120,7 +121,8 @@ public class MainWindow extends JFrame {
         });
 
 
-
+        Function f = new FunctionExplicit();
+        var fpnts = new FunctionPainterExp(cnv, f, clr2.getBackground(), ch2.isSelected());
 
 
         //события изменения цветов
@@ -128,7 +130,7 @@ public class MainWindow extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 var newColor = JColorChooser.showDialog(
-                        MainWindow.this, "Выберите цвет точки", clr1.getBackground());
+                        MainWindow.this, "Выберите цвет графика функции, заданной явно", clr1.getBackground());
                 if(newColor != null){
                     clr1.setBackground(newColor);
                     mainPanel.repaint();
@@ -139,9 +141,10 @@ public class MainWindow extends JFrame {
             @Override
             public void mouseClicked(MouseEvent e) {
                 var newColor = JColorChooser.showDialog(
-                        MainWindow.this, "Выберите цвет графика", clr2.getBackground());
+                        MainWindow.this, "Выберите цвет графика функции, заданной неявно", clr2.getBackground());
                 if(newColor != null){
                     clr2.setBackground(newColor);
+                    fpnts.setColor(newColor);
                     mainPanel.repaint();
                 }
             }
@@ -163,28 +166,34 @@ public class MainWindow extends JFrame {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if(ch1.isSelected()){
-                    mainPanel.addPainter(pnts);
+                    mainPanel.addPainter(fpnts);
                 }
-                else mainPanel.removePainter(pnts);
+                else mainPanel.removePainter(fpnts);
             }
         });
         ch2.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
-                if(ch2.isSelected()) {
+                if(ch2.isSelected()){
                     mainPanel.addPainter(fpnts);
+                    if(ch1.isSelected()) {
+                        //mainPanel.addPainterToTheEnd(pnts);
+                        //mainPanel.removePainter(pnts);
+                    }
+                }
+                else mainPanel.removePainter(fpnts);
+            }
         });
         ch3.addItemListener(new ItemListener() {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if(ch3.isSelected()){
-                    mainPanel.addPainter(dfpnts);
                     if(ch1.isSelected()) {
-                        mainPanel.addPainterToTheEnd(pnts);
-                        mainPanel.removePainter(pnts);
+                        //mainPanel.addPainterToTheEnd(pnts);
+                        //mainPanel.removePainter(pnts);
                     }
                 }
-                else mainPanel.removePainter(dfpnts);
+                //else mainPanel.removePainter(dfpnts);
             }
         });
 
