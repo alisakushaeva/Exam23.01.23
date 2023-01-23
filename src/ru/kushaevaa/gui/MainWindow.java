@@ -1,5 +1,7 @@
 package ru.kushaevaa.gui;
 
-public class MainWindow {
+import javax.swing.*;
+
+public class MainWindow extends JFrame {
 
 }
