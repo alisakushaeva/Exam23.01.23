@@ -13,7 +13,6 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.Graphics;
 import java.util.ArrayList;
-import java.util.HashMap;
 
 public class MainWindow extends JFrame {
 
@@ -25,10 +24,13 @@ public class MainWindow extends JFrame {
     private JLabel xmin, ymin, xmax, ymax;
     private JSpinner xmins, ymins, xmaxs, ymaxs;
     private SpinnerNumberModel nmxmins, nmymins, nmxmaxs, nmymaxs;
-    private JPanel clr1, clr2,clr3;
-    private JLabel clr1n, clr2n, clr3n;
-    private JCheckBox ch1, ch2, ch3;
+    private JPanel clr1, clr2;
+    private JLabel clr1n, clr2n;
+    private JCheckBox ch1, ch2;
     private Graphics g;
+    private JLabel tMin, tMax;
+    private JSpinner tMinS, tMaxS;
+    private SpinnerNumberModel nmtMin, nmtMax;
     public MainWindow(){
         setSize(minSize);
         setMinimumSize(minSize);
@@ -43,18 +45,21 @@ public class MainWindow extends JFrame {
         //панельки
         clr1 = new JPanel();
         clr2 = new JPanel();
-        clr3 = new JPanel();
         clr1.setBackground(Color.BLACK);
         clr2.setBackground(Color.BLUE);
-        clr3.setBackground(Color.orange);
 
         ch1 = new JCheckBox("", true);
         ch2 = new JCheckBox("", true);
-        ch3 = new JCheckBox("", true);
 
         clr1n = new JLabel("Явное задание");
         clr2n = new JLabel("Неявное задание");
-        clr3n = new JLabel("Цвет производной");
+
+        tMin = new JLabel("tMin");
+        tMax = new JLabel("tMax");
+        nmtMin = new SpinnerNumberModel(-10., -1000., 9.9, 0.1);
+        nmtMax = new SpinnerNumberModel(10., -9.9, 1000., 0.1);
+        tMinS = new JSpinner(nmtMin);
+        tMaxS = new JSpinner(nmtMax);
 
 
         xmin = new JLabel();
@@ -102,8 +107,6 @@ public class MainWindow extends JFrame {
         });
 
 
-
-
         //оси
         var pts = new ArrayList<Painter>();//список всех пэйнтеров
         var crt = new CrtPainter(cnv);
@@ -127,8 +130,19 @@ public class MainWindow extends JFrame {
         mainPanel.addPainter(fpnts);
 
         Function g = new FunctionImplicit();
-        var gpnts = new FunctionPainterImp(cnv, g, clr2.getBackground(), ch2.isSelected());
+        var gpnts = new FunctionPainterImp(cnv, g, clr2.getBackground(), ch2.isSelected(), (double)tMinS.getValue(), (double)tMaxS.getValue());
         mainPanel.addPainter(gpnts);
+
+        tMinS.addChangeListener(e -> {
+            nmtMax.setMinimum((Double)nmtMin.getValue() + 2 * (Double)nmtMax.getStepSize());
+            gpnts.setTMin((double)tMinS.getValue());
+            mainPanel.repaint();
+        });
+        tMaxS.addChangeListener(e -> {
+            nmtMin.setMaximum((Double)nmtMax.getValue() - 2 * (Double)nmtMin.getStepSize());
+            gpnts.setTMax((double)tMaxS.getValue());
+            mainPanel.repaint();
+        });
 
 
         //события изменения цветов
@@ -156,17 +170,7 @@ public class MainWindow extends JFrame {
                 }
             }
         });
-        clr3.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                var newColor = JColorChooser.showDialog(
-                        MainWindow.this, "Выберите цвет производной", clr3.getBackground());
-                if(newColor != null){
-                    clr3.setBackground(newColor);
-                    mainPanel.repaint();
-                }
-            }
-        });
+
 
         //события для чекбоксов
         ch1.addItemListener(new ItemListener() {
@@ -187,18 +191,7 @@ public class MainWindow extends JFrame {
                 else mainPanel.removePainter(gpnts);
             }
         });
-        ch3.addItemListener(new ItemListener() {
-            @Override
-            public void itemStateChanged(ItemEvent e) {
-                if(ch3.isSelected()){
-                    if(ch1.isSelected()) {
-                        //mainPanel.addPainterToTheEnd(pnts);
-                        //mainPanel.removePainter(pnts);
-                    }
-                }
-                //else mainPanel.removePainter(dfpnts);
-            }
-        });
+
 
 
         gl.setHorizontalGroup(gl.createSequentialGroup()
@@ -268,11 +261,13 @@ public class MainWindow extends JFrame {
                         )
                         .addGap(8)
                         .addGroup(glcp.createSequentialGroup()
-                                .addComponent(ch3)
+                                .addComponent(tMin)
                                 .addGap(8)
-                                .addComponent(clr3, 45,45,45)
+                                .addComponent(tMinS)
                                 .addGap(8)
-                                .addComponent(clr3n, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE, GroupLayout.DEFAULT_SIZE)
+                                .addComponent(tMax)
+                                .addGap(8)
+                                .addComponent(tMaxS)
                         ))
                 .addGap(8)
         );
@@ -312,9 +307,10 @@ public class MainWindow extends JFrame {
                                         .addComponent(clr2n, GroupLayout.Alignment.CENTER)
                                 )
                                 .addGroup(glcp.createParallelGroup()
-                                        .addComponent(ch3)
-                                        .addComponent(clr3, 20,20,20)
-                                        .addComponent(clr3n, GroupLayout.Alignment.CENTER)
+                                        .addComponent(tMin)
+                                        .addComponent(tMinS)
+                                        .addComponent(tMax)
+                                        .addComponent(tMaxS)
                                 ))
                 )
                 .addGap(8)
