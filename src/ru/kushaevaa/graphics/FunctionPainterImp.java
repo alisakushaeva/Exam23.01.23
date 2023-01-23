@@ -25,9 +25,6 @@ public class FunctionPainterImp implements Painter {
     }
 
     public void paint(Graphics g, int width, int height) {
-        /*Graphics2D g2 = (Graphics2D) g;
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                RenderingHints.VALUE_ANTIALIAS_ON);*/
         double dt = 0.0001;
         if (check) {
             g.setColor(clr);
