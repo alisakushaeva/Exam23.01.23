@@ -5,6 +5,7 @@ import ru.kushaevaa.graphics.*;
 import ru.kushaevaa.graphics.Painter;
 import ru.kushaevaa.math.Function;
 import ru.kushaevaa.math.FunctionExplicit;
+import ru.kushaevaa.math.FunctionImplicit;
 
 
 import javax.swing.*;
@@ -43,7 +44,7 @@ public class MainWindow extends JFrame {
         clr1 = new JPanel();
         clr2 = new JPanel();
         clr3 = new JPanel();
-        clr1.setBackground(Color.RED);
+        clr1.setBackground(Color.BLACK);
         clr2.setBackground(Color.BLUE);
         clr3.setBackground(Color.orange);
 
@@ -122,7 +123,12 @@ public class MainWindow extends JFrame {
 
 
         Function f = new FunctionExplicit();
-        var fpnts = new FunctionPainterExp(cnv, f, clr2.getBackground(), ch2.isSelected());
+        var fpnts = new FunctionPainterExp(cnv, f, clr1.getBackground(), ch1.isSelected());
+        mainPanel.addPainter(fpnts);
+
+        Function g = new FunctionImplicit();
+        var gpnts = new FunctionPainterImp(cnv, g, clr2.getBackground(), ch2.isSelected());
+        mainPanel.addPainter(gpnts);
 
 
         //события изменения цветов
@@ -133,6 +139,7 @@ public class MainWindow extends JFrame {
                         MainWindow.this, "Выберите цвет графика функции, заданной явно", clr1.getBackground());
                 if(newColor != null){
                     clr1.setBackground(newColor);
+                    fpnts.setColor(newColor);
                     mainPanel.repaint();
                 }
             }
@@ -144,7 +151,7 @@ public class MainWindow extends JFrame {
                         MainWindow.this, "Выберите цвет графика функции, заданной неявно", clr2.getBackground());
                 if(newColor != null){
                     clr2.setBackground(newColor);
-                    fpnts.setColor(newColor);
+                    gpnts.setColor(newColor);
                     mainPanel.repaint();
                 }
             }
@@ -175,13 +182,9 @@ public class MainWindow extends JFrame {
             @Override
             public void itemStateChanged(ItemEvent e) {
                 if(ch2.isSelected()){
-                    mainPanel.addPainter(fpnts);
-                    if(ch1.isSelected()) {
-                        //mainPanel.addPainterToTheEnd(pnts);
-                        //mainPanel.removePainter(pnts);
-                    }
+                    mainPanel.addPainter(gpnts);
                 }
-                else mainPanel.removePainter(fpnts);
+                else mainPanel.removePainter(gpnts);
             }
         });
         ch3.addItemListener(new ItemListener() {
